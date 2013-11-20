@@ -45,7 +45,6 @@ Public Class Form1
         requestDictionary.Add("RefNo", Me.txtInvoiceNo.Text)
         requestDictionary.Add("Frequency", "OneTime")
         requestDictionary.Add("RecordNo", "RecordNumberRequested")
-        requestDictionary.Add("PartialAuth", "Allow")
         requestDictionary.Add("SecureDevice", Me.cmbSecureDevices.Text)
         requestDictionary.Add("ComPort", Me.nudComPort.Value.ToString())
         Dim amountDictionary As New Dictionary(Of String, Object)
@@ -347,12 +346,14 @@ Public Class Form1
 
     End Function
 
-    Private Sub BuildParsedResponse(response As String)
+    Private Function BuildParsedResponse(response As String) As Dictionary(Of String, String)
+
+        Dim responseDictionary As Dictionary(Of String, String) = New Dictionary(Of String, String)
         Me.rtbParsedResponse.Clear()
         Me.rtbParsedResponse.ForeColor = Color.Red
 
         If (String.IsNullOrEmpty(response) = False) Then
-            Dim responseDictionary As Dictionary(Of String, String) = XMLHelper.ParseXMLResponse(response)
+            responseDictionary = XMLHelper.ParseXMLResponse(response)
 
             If (responseDictionary.ContainsKey("CmdStatus") _
                 AndAlso (responseDictionary("CmdStatus") = "Approved" Or responseDictionary("CmdStatus") = "Success")) Then
@@ -370,6 +371,77 @@ Public Class Form1
             Me.rtbParsedResponse.Text = sb.ToString()
 
         End If
+
+        Return responseDictionary
+
+    End Function
+
+    Private Sub btnCreditSaleThenCreditVoidSaleByRecordNo_Click(sender As System.Object, e As System.EventArgs) Handles btnCreditSaleThenCreditVoidSaleByRecordNo.Click
+
+        Cursor.Current = Cursors.WaitCursor
+        Dim creditSaleDictionary As New Dictionary(Of String, Object)()
+
+        creditSaleDictionary.Add("TranType", "Credit")
+        creditSaleDictionary.Add("TranCode", "Sale")
+        creditSaleDictionary.Add("MerchantID", Me.GetMerchantID())
+        creditSaleDictionary.Add("InvoiceNo", Me.txtInvoiceNo.Text)
+        creditSaleDictionary.Add("RefNo", Me.txtInvoiceNo.Text)
+        creditSaleDictionary.Add("Frequency", "OneTime")
+        creditSaleDictionary.Add("RecordNo", "RecordNumberRequested")
+        creditSaleDictionary.Add("SecureDevice", Me.cmbSecureDevices.Text)
+        creditSaleDictionary.Add("ComPort", Me.nudComPort.Value.ToString())
+        Dim amountDictionary As New Dictionary(Of String, Object)
+        amountDictionary.Add("Purchase", nudPurchase.Value)
+        creditSaleDictionary.Add("Amount", amountDictionary)
+        Dim accountDictionary As New Dictionary(Of String, Object)
+        accountDictionary.Add("AcctNo", Me.GetAcctNo())
+        creditSaleDictionary.Add("Account", accountDictionary)
+        creditSaleDictionary.Add("OperatorID", Me.txtOperatorID.Text)
+        creditSaleDictionary.Add("Memo", Me.txtMemo.Text)
+
+        Dim xmlRequest As String = XMLHelper.BuildXMLRequest(creditSaleDictionary, "Transaction").ToString()
+        Dim xmlResponse As String = Me.ProcessTransaction(xmlRequest, Me.txtNETePayHostList.Text)
+
+        Dim creditSaleResponse As Dictionary(Of String, String) = Me.BuildParsedResponse(xmlResponse)
+
+        If (creditSaleResponse.ContainsKey("CmdStatus") _
+                AndAlso (creditSaleResponse("CmdStatus") = "Approved")) Then
+
+            Dim creditVoidSaleByRecordNoDictionary As New Dictionary(Of String, Object)()
+
+            creditVoidSaleByRecordNoDictionary.Add("TranType", "Credit")
+            creditVoidSaleByRecordNoDictionary.Add("TranCode", "VoidSaleByRecordNo")
+            creditVoidSaleByRecordNoDictionary.Add("MerchantID", Me.GetMerchantID())
+            creditVoidSaleByRecordNoDictionary.Add("InvoiceNo", Me.txtInvoiceNo.Text)
+            creditVoidSaleByRecordNoDictionary.Add("RefNo", creditSaleResponse("RefNo")) '' RefNo from the original Credit Sale Response
+            creditVoidSaleByRecordNoDictionary.Add("Frequency", "OneTime")
+            creditVoidSaleByRecordNoDictionary.Add("RecordNo", creditSaleResponse("RecordNo")) '' RecordNo from the original Credit Sale Response
+            creditVoidSaleByRecordNoDictionary.Add("SecureDevice", Me.cmbSecureDevices.Text)
+            creditVoidSaleByRecordNoDictionary.Add("ComPort", Me.nudComPort.Value.ToString())
+
+            amountDictionary = New Dictionary(Of String, Object)
+            amountDictionary.Add("Purchase", nudPurchase.Value)
+            creditVoidSaleByRecordNoDictionary.Add("Amount", amountDictionary)
+
+            accountDictionary = New Dictionary(Of String, Object)
+            accountDictionary.Add("AcctNo", Me.GetAcctNo())
+            creditVoidSaleByRecordNoDictionary.Add("Account", accountDictionary)
+
+            Dim tranInfoDictionary = New Dictionary(Of String, Object)
+            tranInfoDictionary.Add("AuthCode", creditSaleResponse("AuthCode")) '' AuthCode from the original Credit Sale Response
+            creditVoidSaleByRecordNoDictionary.Add("TranInfo", tranInfoDictionary)
+
+            creditVoidSaleByRecordNoDictionary.Add("OperatorID", Me.txtOperatorID.Text)
+            creditVoidSaleByRecordNoDictionary.Add("Memo", Me.txtMemo.Text)
+
+            xmlRequest = XMLHelper.BuildXMLRequest(creditVoidSaleByRecordNoDictionary, "Transaction").ToString()
+            xmlResponse = Me.ProcessTransaction(xmlRequest, Me.txtNETePayHostList.Text)
+
+            Dim creditVoidSaleByRecordNoResponse As Dictionary(Of String, String) = Me.BuildParsedResponse(xmlResponse)
+
+        End If
+
+        Cursor.Current = Cursors.Default
 
     End Sub
 

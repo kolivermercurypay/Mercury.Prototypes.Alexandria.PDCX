@@ -52,6 +52,7 @@ Partial Class Form1
         Me.txtGIFTePayHostList = New System.Windows.Forms.TextBox()
         Me.lblConnectTimeout = New System.Windows.Forms.Label()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.btnCreditSaleThenCreditVoidSaleByRecordNo = New System.Windows.Forms.Button()
         Me.lblMemo = New System.Windows.Forms.Label()
         Me.txtMemo = New System.Windows.Forms.TextBox()
         Me.lblPurchase = New System.Windows.Forms.Label()
@@ -395,6 +396,7 @@ Partial Class Form1
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.btnCreditSaleThenCreditVoidSaleByRecordNo)
         Me.GroupBox1.Controls.Add(Me.lblMemo)
         Me.GroupBox1.Controls.Add(Me.txtMemo)
         Me.GroupBox1.Controls.Add(Me.lblPurchase)
@@ -413,9 +415,18 @@ Partial Class Form1
         Me.GroupBox1.Controls.Add(Me.btnDebitSale)
         Me.GroupBox1.Location = New System.Drawing.Point(12, 278)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(725, 126)
+        Me.GroupBox1.Size = New System.Drawing.Size(725, 184)
         Me.GroupBox1.TabIndex = 308
         Me.GroupBox1.TabStop = False
+        '
+        'btnCreditSaleThenCreditVoidSaleByRecordNo
+        '
+        Me.btnCreditSaleThenCreditVoidSaleByRecordNo.Location = New System.Drawing.Point(9, 124)
+        Me.btnCreditSaleThenCreditVoidSaleByRecordNo.Name = "btnCreditSaleThenCreditVoidSaleByRecordNo"
+        Me.btnCreditSaleThenCreditVoidSaleByRecordNo.Size = New System.Drawing.Size(152, 54)
+        Me.btnCreditSaleThenCreditVoidSaleByRecordNo.TabIndex = 307
+        Me.btnCreditSaleThenCreditVoidSaleByRecordNo.Text = "Credit Sale" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "then" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Credit VoidSaleByRecordNo"
+        Me.btnCreditSaleThenCreditVoidSaleByRecordNo.UseVisualStyleBackColor = True
         '
         'lblMemo
         '
@@ -560,7 +571,7 @@ Partial Class Form1
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(229, Byte), Integer), CType(CType(236, Byte), Integer), CType(CType(244, Byte), Integer))
-        Me.ClientSize = New System.Drawing.Size(952, 415)
+        Me.ClientSize = New System.Drawing.Size(952, 474)
         Me.Controls.Add(Me.lblParsedResponse)
         Me.Controls.Add(Me.rtbParsedResponse)
         Me.Controls.Add(Me.Label3)
@@ -629,5 +640,6 @@ Partial Class Form1
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents rtbParsedResponse As System.Windows.Forms.RichTextBox
     Friend WithEvents lblParsedResponse As System.Windows.Forms.Label
+    Friend WithEvents btnCreditSaleThenCreditVoidSaleByRecordNo As System.Windows.Forms.Button
 
 End Class
